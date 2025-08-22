@@ -28,7 +28,7 @@ export class UsersController {
 
   @Post()
   @HttpCode(200)
-  async createUser(@Body() data: CreateUserDto): Promise<User> {
+  async createUser(@Body() data: CreateUserDto): Promise<string> {
     return this.userService.createUser(data);
   }
 

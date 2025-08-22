@@ -13,7 +13,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(data: CreateUserDto): Promise<User> {
+  async createUser(data: CreateUserDto): Promise<string> {
     console.log(
       `criando usuario: { name: ${data.name}, email: ${data.email}, data: ${new Date().toLocaleDateString()}, hora: ${new Date().toLocaleTimeString()} }`,
     );
@@ -26,13 +26,14 @@ export class UserService {
     }
     const salt = 10;
     const passwordHashed = await bcrypt.hash(data.password, salt);
-    return await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
         password: passwordHashed,
       },
     });
+    return 'Usuário criado com sucesso!';
   }
 
   async findByEmail(email: string): Promise<User | null> {
