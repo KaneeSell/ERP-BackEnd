@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -13,7 +14,6 @@ import { Produtos } from 'generated/prisma';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeProdutoDto } from './dto/change-produto.dto';
-import { DeleteProdutoDto } from './dto/delete-produto.dto';
 
 @Controller('produtos')
 export class ProdutosController {
@@ -41,9 +41,9 @@ export class ProdutosController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete()
+  @Delete(':id')
   @HttpCode(200)
-  async deleteProduto(@Body() data: DeleteProdutoDto): Promise<string | void> {
-    return this.produtoService.deleteProduto(data);
+  async deleteProduto(@Param('id') id: string): Promise<string | void> {
+    return this.produtoService.deleteProduto(Number(id));
   }
 }

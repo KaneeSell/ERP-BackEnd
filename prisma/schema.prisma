@@ -34,7 +34,7 @@ model User {
 
 model Produtos {
   id         Int                 @id @default(autoincrement())
-  name       String              @unique
+  name       String
   value      Float
   isAtive    Boolean             @default(true)
   createdAt  DateTime            @default(now())

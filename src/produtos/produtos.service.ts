@@ -1,13 +1,8 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Produtos } from '../../generated/prisma';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { ChangeProdutoDto } from './dto/change-produto.dto';
-import { DeleteProdutoDto } from './dto/delete-produto.dto';
 
 @Injectable()
 export class ProdutosService {
@@ -17,13 +12,6 @@ export class ProdutosService {
     console.log(
       `criando produto: { name: ${data.name}, data: ${new Date().toLocaleDateString()}, hora: ${new Date().toLocaleTimeString()} }`,
     );
-    const produtoExists = await this.prisma.produtos.findUnique({
-      where: { name: data.name },
-    });
-    if (produtoExists) {
-      console.log('produto já existe.');
-      throw new BadRequestException('Este nome de produto já está cadastrado.');
-    }
     return await this.prisma.produtos.create({
       data: {
         name: data.name,
@@ -32,9 +20,9 @@ export class ProdutosService {
     });
   }
 
-  async findByName(name: string): Promise<Produtos | null> {
+  async findByName(name: string): Promise<Produtos[] | null> {
     console.log(`buscando produtos por nome: { name: ${name} }`);
-    return await this.prisma.produtos.findUnique({ where: { name: name } });
+    return await this.prisma.produtos.findMany({ where: { name: name } });
   }
 
   async findAll(): Promise<Produtos[] | null> {
@@ -69,17 +57,17 @@ export class ProdutosService {
     }
   }
 
-  async deleteProduto(data: DeleteProdutoDto): Promise<string | void> {
-    console.log(`deleteProduto: { id: ${data.id} }`);
+  async deleteProduto(id: number): Promise<string | void> {
+    console.log(`deleteProduto: { id: ${id} }`);
     const produtoExists = await this.prisma.produtos.findUnique({
-      where: { id: data.id },
+      where: { id: id },
     });
     if (produtoExists) {
       console.log(
         `Produto deletado: {name: ${produtoExists.name}, value: ${produtoExists.value}}`,
       );
       await this.prisma.produtos.update({
-        where: { id: data.id },
+        where: { id: id },
         data: { deletedAt: new Date() },
       });
       console.log('Produto excluido com sucesso!');
