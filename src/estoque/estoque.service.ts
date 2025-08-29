@@ -7,11 +7,19 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { Estoque } from '../../generated/prisma';
 import { CreateEstoqueDto } from './dto/create-estoque.dto';
 import { ChangeEstoqueDto } from './dto/change-estoque.dto';
-import { DeleteEstoqueDto } from './dto/delete-estoque.dto';
 
 @Injectable()
 export class EstoqueService {
   constructor(private prisma: PrismaService) {}
+
+  async findById(id: number): Promise<Estoque | null> {
+    console.log(`buscando estoque por id: { id: ${id} }`);
+    const estoque = await this.prisma.estoque.findUnique({ where: { id: id } });
+    if (!estoque) {
+      throw new BadRequestException('Estoque Não encontrado!');
+    }
+    return estoque;
+  }
 
   async createProduto(data: CreateEstoqueDto): Promise<Estoque> {
     console.log(
@@ -64,15 +72,15 @@ export class EstoqueService {
     }
   }
 
-  async deleteEstoque(data: DeleteEstoqueDto): Promise<string | void> {
-    console.log(`deleteEstoque: { id: ${data.id} }`);
+  async deleteEstoque(id: number): Promise<string | void> {
+    console.log(`deleteEstoque: { id: ${id} }`);
     const produtoExists = await this.prisma.estoque.findUnique({
-      where: { id: data.id },
+      where: { id: id },
     });
     if (produtoExists) {
       console.log(`Estoque deletado: {name: ${produtoExists.name}}`);
       await this.prisma.estoque.update({
-        where: { id: data.id },
+        where: { id },
         data: { deletedAt: new Date() },
       });
       console.log('Estoque excluido com sucesso!');

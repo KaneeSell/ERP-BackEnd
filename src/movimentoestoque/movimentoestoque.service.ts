@@ -1,9 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Movimento_Estoque } from '../../generated/prisma';
+import { Movimento_Estoque, Prisma } from '../../generated/prisma';
 import { CreateMovimentoEstoqueDto } from './dto/create-movimentoestoque.dto';
 import { ChangeMovimentoEstoqueDto } from './dto/change-movimentoestoque.dto';
-import { DeleteMovimentoEstoqueDto } from './dto/delete-movimentoestoque.dto';
 
 @Injectable()
 export class MovimentoEstoqueService {
@@ -13,28 +16,39 @@ export class MovimentoEstoqueService {
     data: CreateMovimentoEstoqueDto,
   ): Promise<Movimento_Estoque> {
     console.log(
-      `criando estoque: { produto_id: ${data.produto_id}, estoque_id: ${data.estoque_id}, quantidade: ${data.quantidade}, tipo: ${data.tipo} }`,
+      `criando movimento estoque: { produto_id: ${data.produto_id}, estoque_id: ${data.estoque_id}, quantidade: ${data.quantidade}, tipo: ${data.tipo} }`,
     );
-    return await this.prisma.movimento_Estoque.create({
-      data: {
-        descricao: data.descricao ? data.descricao : null,
-        produtoId: data.produto_id,
-        estoqueId: data.estoque_id,
-        quantidade: data.quantidade,
-        tipo: data.tipo,
-      },
-    });
+    try {
+      return await this.prisma.movimento_Estoque.create({
+        data: {
+          descricao: data.descricao ? data.descricao : null,
+          produtoId: data.produto_id,
+          estoqueId: data.estoque_id,
+          quantidade: data.quantidade,
+          tipo: data.tipo,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2003') {
+          throw new BadRequestException(
+            'Id de produto ou Id de estoque inválido.',
+          );
+        }
+      }
+      throw error; // outros erros sobem "normais"
+    }
   }
 
-  async findByProdutoId(
-    produto_id: number,
-  ): Promise<Movimento_Estoque[] | null> {
-    console.log(
-      `buscando movimentos de estoque por descricao: { produto_id: ${produto_id} }`,
-    );
-    return await this.prisma.movimento_Estoque.findMany({
-      where: { produtoId: produto_id },
+  async findById(id: number): Promise<Movimento_Estoque | null> {
+    console.log(`buscando movimento estoque por id: { id: ${id} }`);
+    const movimento = await this.prisma.movimento_Estoque.findUnique({
+      where: { id: id },
     });
+    if (!movimento) {
+      throw new BadRequestException('Movimento Estoque Não encontrado!');
+    }
+    return movimento;
   }
 
   async findAll(): Promise<Movimento_Estoque[] | null> {
@@ -60,38 +74,47 @@ export class MovimentoEstoqueService {
       console.log(
         `New {produto_id: ${data.produto_id}, estoque_id: ${data.estoque_id}, quantidade: ${data.quantidade}, tipo: ${data.tipo}}`,
       );
-      await this.prisma.movimento_Estoque.update({
-        where: { id: data.id },
-        data: {
-          descricao: data.descricao ? data.descricao : null,
-          produtoId: data.produto_id,
-          estoqueId: data.estoque_id,
-          quantidade: data.quantidade,
-          tipo: data.tipo,
-        },
-      });
-      console.log('Movimento Estoque alterado com sucesso!');
-      return 'Movimento Estoque alterado com sucesso!';
+      try {
+        await this.prisma.movimento_Estoque.update({
+          where: { id: data.id },
+          data: {
+            descricao: data.descricao ? data.descricao : null,
+            produtoId: data.produto_id,
+            estoqueId: data.estoque_id,
+            quantidade: data.quantidade,
+            tipo: data.tipo,
+          },
+        });
+        console.log('Movimento Estoque alterado com sucesso!');
+        return 'Movimento Estoque alterado com sucesso!';
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          if (error.code === 'P2003') {
+            throw new BadRequestException(
+              'Id de produto ou Id de estoque inválido.',
+            );
+          }
+        }
+        throw error; // outros erros sobem "normais"
+      }
     } else {
       console.log('Não existe esse movimento estoque.');
       throw new UnauthorizedException('Não existe esse movimento estoque.');
     }
   }
 
-  async deleteMovimentoEstoque(
-    data: DeleteMovimentoEstoqueDto,
-  ): Promise<string | void> {
-    console.log(`deleteEstoque: { id: ${data.id} }`);
+  async deleteMovimentoEstoque(id: number): Promise<string | void> {
+    console.log(`deleteEstoque: { id: ${id} }`);
     const movimentoEstoqueExists =
       await this.prisma.movimento_Estoque.findUnique({
-        where: { id: data.id },
+        where: { id: id },
       });
     if (movimentoEstoqueExists) {
       console.log(
-        `Estoque deletado: {produto_id: ${movimentoEstoqueExists.produtoId}, estoque_id: ${movimentoEstoqueExists.estoqueId}, quantidade: ${movimentoEstoqueExists.quantidade}, tipo: ${movimentoEstoqueExists.tipo}}`,
+        `Movimento Estoque deletado: {produto_id: ${movimentoEstoqueExists.produtoId}, estoque_id: ${movimentoEstoqueExists.estoqueId}, quantidade: ${movimentoEstoqueExists.quantidade}, tipo: ${movimentoEstoqueExists.tipo}}`,
       );
       await this.prisma.movimento_Estoque.update({
-        where: { id: data.id },
+        where: { id: id },
         data: { deletedAt: new Date() },
       });
       console.log('Movimento Estoque excluido com sucesso!');

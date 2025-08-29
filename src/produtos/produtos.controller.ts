@@ -27,6 +27,13 @@ export class ProdutosController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  @HttpCode(200)
+  async findById(@Param('id') id: string): Promise<Produtos | null> {
+    return this.produtoService.findById(Number(id));
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   @HttpCode(200)
   async createProduto(@Body() data: CreateProdutoDto): Promise<Produtos> {

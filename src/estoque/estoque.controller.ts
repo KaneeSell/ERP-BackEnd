@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -13,7 +14,6 @@ import { Estoque } from 'generated/prisma';
 import { CreateEstoqueDto } from './dto/create-estoque.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeEstoqueDto } from './dto/change-estoque.dto';
-import { DeleteEstoqueDto } from './dto/delete-estoque.dto';
 
 @Controller('estoque')
 export class EstoqueController {
@@ -24,6 +24,13 @@ export class EstoqueController {
   @HttpCode(200)
   async findAll(): Promise<Estoque[] | null> {
     return this.estoqueService.findAll();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  @HttpCode(200)
+  async findById(@Param('id') id: string): Promise<Estoque | null> {
+    return this.estoqueService.findById(Number(id));
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -41,9 +48,9 @@ export class EstoqueController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete()
+  @Delete(':id')
   @HttpCode(200)
-  async deleteProduto(@Body() data: DeleteEstoqueDto): Promise<string | void> {
-    return this.estoqueService.deleteEstoque(data);
+  async deleteEstoque(@Param('id') id: string): Promise<string | void> {
+    return this.estoqueService.deleteEstoque(Number(id));
   }
 }

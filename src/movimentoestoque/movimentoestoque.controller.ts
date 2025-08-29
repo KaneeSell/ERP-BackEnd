@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Param,
   Patch,
   Post,
   UseGuards,
@@ -13,7 +14,6 @@ import { Movimento_Estoque } from 'generated/prisma';
 import { CreateMovimentoEstoqueDto } from './dto/create-movimentoestoque.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeMovimentoEstoqueDto } from './dto/change-movimentoestoque.dto';
-import { DeleteMovimentoEstoqueDto } from './dto/delete-movimentoestoque.dto';
 
 @Controller('movimento-estoque')
 export class MovimentoEstoqueController {
@@ -26,6 +26,13 @@ export class MovimentoEstoqueController {
   @HttpCode(200)
   async findAll(): Promise<Movimento_Estoque[] | null> {
     return this.movimentoEstoqueService.findAll();
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':id')
+  @HttpCode(200)
+  async findById(@Param('id') id: string): Promise<Movimento_Estoque | null> {
+    return this.movimentoEstoqueService.findById(Number(id));
   }
 
   @UseGuards(AuthGuard('jwt'))
@@ -47,11 +54,11 @@ export class MovimentoEstoqueController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Delete()
+  @Delete(':id')
   @HttpCode(200)
   async deleteMovimentoEstoque(
-    @Body() data: DeleteMovimentoEstoqueDto,
+    @Param('id') id: string,
   ): Promise<string | void> {
-    return this.movimentoEstoqueService.deleteMovimentoEstoque(data);
+    return this.movimentoEstoqueService.deleteMovimentoEstoque(Number(id));
   }
 }

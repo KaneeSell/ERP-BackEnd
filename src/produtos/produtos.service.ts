@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Produtos } from '../../generated/prisma';
 import { CreateProdutoDto } from './dto/create-produto.dto';
@@ -20,9 +24,13 @@ export class ProdutosService {
     });
   }
 
-  async findByName(name: string): Promise<Produtos[] | null> {
-    console.log(`buscando produtos por nome: { name: ${name} }`);
-    return await this.prisma.produtos.findMany({ where: { name: name } });
+  async findById(id: number): Promise<Produtos | null> {
+    console.log(`buscando produtos por id: { id: ${id} }`);
+    const produto = await this.prisma.produtos.findUnique({
+      where: { id: id },
+    });
+    if (!produto) throw new BadRequestException('Produto não encontrado!');
+    return produto;
   }
 
   async findAll(): Promise<Produtos[] | null> {
