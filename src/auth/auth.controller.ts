@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from './admin.guard';
 
 @Controller('login')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AdminGuard)
   @Get()
   @HttpCode(200)
   tokenValid(): string {
