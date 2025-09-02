@@ -28,7 +28,6 @@ export class AdminGuard extends AuthGuard('jwt') implements CanActivate {
       .switchToHttp()
       .getRequest<Request & { user: JwtUser }>();
     const user = request.user;
-    console.log(user)
 
     if (user.role !== 'admin') {
       throw new UnauthorizedException(
