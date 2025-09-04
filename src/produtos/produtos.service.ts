@@ -20,6 +20,7 @@ export class ProdutosService {
       data: {
         name: data.name,
         value: data.value,
+        valueVenda: data.valueVenda,
       },
     });
   }

@@ -6,4 +6,6 @@ export class CreateProdutoDto {
   name: string;
   @IsNotEmpty({ message: 'O valor é Obrigatório.' })
   value: number;
+  @IsNotEmpty({ message: 'O valor de venda é Obrigatório.' })
+  valueVenda: number;
 }

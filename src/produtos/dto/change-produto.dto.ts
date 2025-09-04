@@ -8,6 +8,8 @@ export class ChangeProdutoDto {
   name: string;
   @IsNotEmpty({ message: 'O valor é Obrigatório.' })
   value: number;
+  @IsNotEmpty({ message: 'O valor de venda é Obrigatório.' })
+  valueVenda: number;
   @IsNotEmpty({ message: 'O status é Obrigatório.' })
   isAtive: boolean;
 }

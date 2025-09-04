@@ -29,12 +29,12 @@ export class AdminGuard extends AuthGuard('jwt') implements CanActivate {
       .getRequest<Request & { user: JwtUser }>();
     const user = request.user;
 
-    if (user.role !== 'guest') {
+    if (user.role === 'guest') {
       throw new UnauthorizedException(
         'Acesso permitido apenas para pessoas autorizadas.',
       );
+    } else {
+      return true;
     }
-
-    return true;
   }
 }
