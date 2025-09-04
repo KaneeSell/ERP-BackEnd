@@ -13,7 +13,7 @@ export class AuthService {
   ) {}
   async login(data: LoginDto): Promise<{
     access_token: string;
-    user: { id: string; email: string, role: Role };
+    user: { id: string; email: string; role: Role };
   } | void> {
     console.log(
       `Login: { email: ${data.email}, data: ${new Date().toLocaleDateString()}, hora: ${new Date().toLocaleTimeString()} }`,
@@ -27,10 +27,18 @@ export class AuthService {
         userExists.password,
       );
       if (passwordValid) {
-        const payload = { email: userExists.email, sub: userExists.id, role: userExists.role };
+        const payload = {
+          email: userExists.email,
+          sub: userExists.id,
+          role: userExists.role,
+        };
         return {
           access_token: this.jwtService.sign(payload),
-          user: { id: payload.sub.toString(), email: payload.email, role: payload.role },
+          user: {
+            id: payload.sub.toString(),
+            email: payload.email,
+            role: payload.role,
+          },
         };
       } else {
         console.log('Senha inválida.');
