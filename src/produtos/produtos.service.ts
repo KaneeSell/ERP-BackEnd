@@ -54,11 +54,22 @@ export class ProdutosService {
       console.log(
         `New {name: ${data.name}, value: ${data.value}, isAtive: ${data.isAtive}}`,
       );
-      await this.prisma.produtos.update({
-        where: { id: data.id },
-        data: { name: data.name, value: data.value, isAtive: data.isAtive },
-      });
-      console.log('Produto alterado com sucesso!');
+      try {
+        const response = await this.prisma.produtos.update({
+          where: { id: data.id },
+          data: {
+            name: data.name,
+            value: data.value,
+            isAtive: data.isAtive,
+            valueVenda: data.valueVenda,
+          },
+        });
+        console.log('Produto alterado com sucesso!');
+        console.log(response);
+      } catch (error) {
+        console.log('Erro ao alterar produto:', error);
+        throw new BadRequestException('Erro ao alterar produto.');
+      }
       return 'Produto alterado com sucesso!';
     } else {
       console.log('Não existe esse produto.');

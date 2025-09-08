@@ -22,30 +22,30 @@ enum Role {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String
+  id         Int       @id @default(autoincrement())
+  name       String
   entidadeId Int?
-  entidade    Entidade?  @relation(fields: [entidadeId], references: [id])
-  email     String    @unique
-  password  String
-  role      Role      @default(guest)
-  isActive  Boolean   @default(true)
-  lastLogin DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  entidade   Entidade? @relation(fields: [entidadeId], references: [id])
+  email      String    @unique
+  password   String
+  role       Role      @default(guest)
+  isActive   Boolean   @default(true)
+  lastLogin  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
 }
 
 model Produtos {
-  id         Int                 @id @default(autoincrement())
-  name       String
-  value      Float
-  valueVenda Float
-  isAtive    Boolean             @default(true)
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
-  deletedAt  DateTime?
-  movimentos Movimento_Estoque[]
+  id                 Int                  @id @default(autoincrement())
+  name               String
+  value              Float
+  valueVenda         Float                @default(0)
+  isAtive            Boolean              @default(true)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  deletedAt          DateTime?
+  movimentos         Movimento_Estoque[]
   itensPedidoDeVenda Item_PedidoDeVenda[]
 }
 
@@ -78,55 +78,55 @@ model Movimento_Estoque {
 }
 
 model Entidade {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String?
-  telefone   String?
-  endereco   String?
-  cidade     String?
-  estado     String?
-  cep        String?
-  creditoGasto Float     @default(0)
-  creditoLimite Float     @default(0)
-  creditoIsAtive Boolean   @default(false)
-  isFornecedor Boolean @default(false)
-  isCliente  Boolean   @default(false)
-  cnpj       String?   @unique
-  cpf        String?   @unique
-  isAtive    Boolean   @default(true)
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
+  id             Int             @id @default(autoincrement())
+  name           String
+  email          String?
+  telefone       String?
+  endereco       String?
+  cidade         String?
+  estado         String?
+  cep            String?
+  creditoGasto   Float           @default(0)
+  creditoLimite  Float           @default(0)
+  creditoIsAtive Boolean         @default(false)
+  isFornecedor   Boolean         @default(false)
+  isCliente      Boolean         @default(false)
+  cnpj           String?         @unique
+  cpf            String?         @unique
+  isAtive        Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
   pedidosDeVenda PedidoDeVenda[]
-  users User[]
+  users          User[]
 }
 
 model PedidoDeVenda {
-  id            Int       @id @default(autoincrement())
+  id            Int                  @id @default(autoincrement())
   entidadeId    Int
-  entidade      Entidade  @relation(fields: [entidadeId], references: [id])
+  entidade      Entidade             @relation(fields: [entidadeId], references: [id])
   valorTotal    Float
-  desconto      Float     @default(0)
+  desconto      Float                @default(0)
   valorFinal    Float
-  isPago        Boolean   @default(false)
+  isPago        Boolean              @default(false)
   dataVenda     DateTime
   dataPagamento DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   deletedAt     DateTime?
   itens         Item_PedidoDeVenda[]
 }
 
 model Item_PedidoDeVenda {
-  id                Int              @id @default(autoincrement())
-  pedidoDeVendaId   Int
-  pedidoDeVenda     PedidoDeVenda    @relation(fields: [pedidoDeVendaId], references: [id])
-  produtoId         Int
-  produto           Produtos         @relation(fields: [produtoId], references: [id])
-  quantidade        Float
-  valorUnitario     Float
-  valorTotal        Float
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  deletedAt         DateTime?
+  id              Int           @id @default(autoincrement())
+  pedidoDeVendaId Int
+  pedidoDeVenda   PedidoDeVenda @relation(fields: [pedidoDeVendaId], references: [id])
+  produtoId       Int
+  produto         Produtos      @relation(fields: [produtoId], references: [id])
+  quantidade      Float
+  valorUnitario   Float
+  valorTotal      Float
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
 }
