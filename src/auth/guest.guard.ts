@@ -15,9 +15,9 @@ interface JwtUser {
 }
 
 @Injectable()
-export class AdminGuard extends AuthGuard('jwt') implements CanActivate {
+export class GuestGuard extends AuthGuard('jwt') implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Primeiro chama o AuthGuard padrão para validar JWT
+    // Primeiro chama o GuestGuard padrão para validar JWT
     const isAuthenticated = (await super.canActivate(context)) as boolean;
     if (!isAuthenticated) {
       return false;
@@ -29,9 +29,9 @@ export class AdminGuard extends AuthGuard('jwt') implements CanActivate {
       .getRequest<Request & { user: JwtUser }>();
     const user = request.user;
 
-    if (user.role !== 'admin' && user.role !== 'developer') {
+    if (user.role !== 'guest' && user.role !== 'developer') {
       throw new UnauthorizedException(
-        'Acesso permitido apenas para pessoas autorizadas.',
+        'Acesso permitido apenas para pessoas recém cadastradas.',
       );
     } else {
       return true;
