@@ -21,6 +21,53 @@ enum Role {
   developer
 }
 
+enum TipoUnidade {
+  // Unidades básicas
+  Unidade
+  Pacote
+  Caixa
+  Frasco
+  Litro
+  Mililitro
+  Galão
+
+  // Massa / peso
+  Kg
+  Grama
+  Miligrama
+  Tonelada
+  Libra
+  Onca
+
+  // Comprimento
+  Metro
+  Centimetro
+  Milimetro
+  Quilometro
+  Polegada
+  Pe
+
+  // Área
+  MetroQuadrado
+  CentimetroQuadrado
+  Hectare
+  Acre
+
+  // Volume
+  MetroCubico
+  LitroCubico
+  MililitroCubico
+
+  // Tempo
+  Segundo
+  Minuto
+  Hora
+  Dia
+
+  // Outros
+  UnidadeMedidaEspecial
+}
+
 model User {
   id         Int       @id @default(autoincrement())
   name       String
@@ -36,22 +83,79 @@ model User {
   deletedAt  DateTime?
 }
 
+enum TipoEmpresa {
+  Matriz
+  Filial
+}
+
+model Empresas {
+  id           Int          @id @default(autoincrement())
+  nameRazao    String       @unique
+  nomeFantasia String?
+  cep          String?
+  endereco     String?
+  pais         String?
+  cidade       String?
+  estado       String?
+  bairro       String?
+  rua          String?
+  numero       String?
+  telefone     String?
+  cnpj         String?      @unique
+  ie           String?      @unique
+  logo         String?
+  tipoEmpresa  TipoEmpresa?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+}
+
 model Produtos {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  value              Float
-  valueVenda         Float                @default(0)
-  isAtive            Boolean              @default(true)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  deletedAt          DateTime?
-  movimentos         Movimento_Estoque[]
-  itensPedidoDeVenda Item_PedidoDeVenda[]
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  value               Float
+  valueVenda          Float                 @default(0)
+  descricao           String?
+  grupoProdutoId      Int?
+  quantidade          Float                 @default(0)
+  tipoUnidade         TipoUnidade?          @default(Unidade)
+  isAtive             Boolean               @default(true)
+  ultimaVenda         DateTime?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  deletedAt           DateTime?
+  movimentos          Movimento_Estoque[]
+  itensPedidoDeVenda  Item_PedidoDeVenda[]
+  itensPedidoDeCompra Item_PedidoDeCompra[]
+  grupoProduto        GrupoProduto?         @relation(fields: [grupoProdutoId], references: [id])
+  SubGrupoProduto     SubGrupoProduto?      @relation(fields: [subGrupoProdutoId], references: [id])
+  subGrupoProdutoId   Int?
+}
+
+model GrupoProduto {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  descricao String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+  Produtos  Produtos[]
+}
+
+model SubGrupoProduto {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  descricao String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  deletedAt DateTime?
+  Produtos  Produtos[]
 }
 
 model Estoque {
   id         Int                 @id @default(autoincrement())
   name       String              @unique
+  descricao  String?
   createdAt  DateTime            @default(now())
   updatedAt  DateTime            @updatedAt
   deletedAt  DateTime?
@@ -78,43 +182,65 @@ model Movimento_Estoque {
 }
 
 model Entidade {
-  id             Int             @id @default(autoincrement())
-  name           String
-  email          String?
-  telefone       String?
-  endereco       String?
-  cidade         String?
-  estado         String?
-  cep            String?
-  creditoGasto   Float           @default(0)
-  creditoLimite  Float           @default(0)
-  creditoIsAtive Boolean         @default(false)
-  isFornecedor   Boolean         @default(false)
-  isCliente      Boolean         @default(false)
-  cnpj           String?         @unique
-  cpf            String?         @unique
-  isAtive        Boolean         @default(true)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  deletedAt      DateTime?
-  pedidosDeVenda PedidoDeVenda[]
-  users          User[]
+  id              Int              @id @default(autoincrement())
+  name            String
+  nomeFantasia    String?
+  email           String?
+  telefone        String?
+  endereco        String?
+  cidade          String?
+  estado          String?
+  cep             String?
+  primeiraVenda   DateTime?
+  primeiraCompra  DateTime?
+  ultimaCompra    DateTime?
+  ultimaVenda     DateTime?
+  creditoGasto    Float            @default(0)
+  creditoLimite   Float            @default(0)
+  creditoIsAtive  Boolean          @default(false)
+  isFornecedor    Boolean          @default(false)
+  isCliente       Boolean          @default(false)
+  cnpj            String?          @unique
+  cpf             String?          @unique
+  isAtive         Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
+  pedidosDeVenda  PedidoDeVenda[]
+  pedidosDeCompra PedidoDeCompra[]
+  users           User[]
+  Despesas        Despesas[]
 }
 
 model PedidoDeVenda {
-  id            Int                  @id @default(autoincrement())
-  entidadeId    Int
-  entidade      Entidade             @relation(fields: [entidadeId], references: [id])
-  valorTotal    Float
-  desconto      Float                @default(0)
-  valorFinal    Float
-  isPago        Boolean              @default(false)
-  dataVenda     DateTime
-  dataPagamento DateTime?
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  deletedAt     DateTime?
-  itens         Item_PedidoDeVenda[]
+  id             Int                  @id @default(autoincrement())
+  descricao      String?
+  entidadeId     Int?
+  entidade       Entidade?            @relation(fields: [entidadeId], references: [id])
+  valorTotal     Float
+  desconto       Float                @default(0)
+  valorFinal     Float
+  isPago         Boolean              @default(false)
+  dataVenda      DateTime
+  dataPagamento  DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  deletedAt      DateTime?
+  itens          Item_PedidoDeVenda[]
+  parcelas       ParcelaPedidoVenda[]
+  ContasAReceber ContasAReceber[]
+}
+
+model ParcelaPedidoVenda {
+  id              Int           @id @default(autoincrement())
+  descricao       String?
+  pedidoDeVendaId Int
+  pedidoDeVenda   PedidoDeVenda @relation(fields: [pedidoDeVendaId], references: [id])
+  valorParcela    Float
+  dataVencimento  DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
 }
 
 model Item_PedidoDeVenda {
@@ -129,4 +255,113 @@ model Item_PedidoDeVenda {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   deletedAt       DateTime?
+}
+
+model PedidoDeCompra {
+  id            Int                   @id @default(autoincrement())
+  descricao     String?
+  entidadeId    Int?
+  entidade      Entidade?             @relation(fields: [entidadeId], references: [id])
+  valorTotal    Float
+  desconto      Float                 @default(0)
+  valorFinal    Float
+  isPago        Boolean               @default(false)
+  dataCompra    DateTime
+  dataPagamento DateTime?
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  deletedAt     DateTime?
+  itens         Item_PedidoDeCompra[]
+  parcelas      ParcelaPedidoCompra[]
+  contaAPagar   ContasAPagar[]
+}
+
+model ParcelaPedidoCompra {
+  id               Int            @id @default(autoincrement())
+  descricao        String?
+  pedidoDeCompraId Int
+  pedidoDeCompra   PedidoDeCompra @relation(fields: [pedidoDeCompraId], references: [id])
+  valorParcela     Float
+  dataVencimento   DateTime
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+}
+
+model Item_PedidoDeCompra {
+  id               Int            @id @default(autoincrement())
+  pedidoDeCompraId Int
+  pedidoDeCompra   PedidoDeCompra @relation(fields: [pedidoDeCompraId], references: [id])
+  produtoId        Int
+  produto          Produtos       @relation(fields: [produtoId], references: [id])
+  quantidade       Float
+  valorUnitario    Float
+  valorTotal       Float
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+}
+
+model ContasAReceber {
+  id              Int           @id @default(autoincrement())
+  descricao       String?
+  pedidoDeVendaId Int
+  pedidoDeVenda   PedidoDeVenda @relation(fields: [pedidoDeVendaId], references: [id])
+  valorTotal      Float
+  desconto        Float         @default(0)
+  valorFinal      Float
+  isPago          Boolean       @default(false)
+  dataRecebimento DateTime
+  dataPagamento   DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?
+  LivroCaixa      LivroCaixa[]
+}
+
+model ContasAPagar {
+  id               Int            @id @default(autoincrement())
+  descricao        String?
+  pedidoDeCompraId Int
+  pedidoDeCompra   PedidoDeCompra @relation(fields: [pedidoDeCompraId], references: [id])
+  valorTotal       Float
+  desconto         Float          @default(0)
+  valorFinal       Float
+  isPago           Boolean        @default(false)
+  dataRecebimento  DateTime
+  dataPagamento    DateTime?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+  LivroCaixa       LivroCaixa[]
+}
+
+model LivroCaixa {
+  id               Int            @id @default(autoincrement())
+  descricao        String?
+  contasAReceberID Int
+  contasAReceber   ContasAReceber @relation(fields: [contasAReceberID], references: [id])
+  contasAPagarID   Int
+  contasAPagar     ContasAPagar   @relation(fields: [contasAPagarID], references: [id])
+  data             DateTime
+  debito           Float          @default(0)
+  credito          Float          @default(0)
+  saldo            Float          @default(0)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+}
+
+model Despesas {
+  id          Int       @id @default(autoincrement())
+  entidadeId  Int?
+  descricao   String?
+  entidade    Entidade? @relation(fields: [entidadeId], references: [id])
+  valorTotal  Float
+  desconto    Float     @default(0)
+  valorFinal  Float
+  dataDespesa DateTime
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 }

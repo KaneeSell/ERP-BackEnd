@@ -4,65 +4,60 @@ import {
   IsEmail,
   IsBoolean,
   IsNumber,
+  IsDate,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateEntidadeDto {
-  @IsString()
+  @IsNotEmpty({ message: 'O Nome é Obrigatório.' })
+  @IsString({ message: 'O nome é obrigatório e deve ser um texto válido.' })
   name: string;
-
-  @IsEmail()
+  @IsEmail({}, { message: 'E-mail inválido. Informe um e-mail válido.' })
   @IsOptional()
   email?: string;
-
-  @IsString()
+  @IsString({ message: 'Telefone deve ser um texto válido.' })
   @IsOptional()
   telefone?: string;
-
-  @IsString()
+  @IsString({ message: 'Endereço deve ser um texto válido.' })
   @IsOptional()
   endereco?: string;
-
-  @IsString()
+  @IsString({ message: 'Cidade deve ser um texto válido.' })
   @IsOptional()
   cidade?: string;
-
-  @IsString()
+  @IsString({ message: 'Estado deve ser um texto válido.' })
   @IsOptional()
   estado?: string;
-
-  @IsString()
+  @IsString({ message: 'CEP deve ser um texto válido.' })
   @IsOptional()
   cep?: string;
-
-  @IsNumber()
+  @IsNumber({}, { message: 'O crédito gasto deve ser um número.' })
   @IsOptional()
   creditoGasto?: number;
-
-  @IsNumber()
+  @IsNumber({}, { message: 'O limite de crédito deve ser um número.' })
   @IsOptional()
   creditoLimite?: number;
-
-  @IsBoolean()
+  @IsBoolean({ message: 'O campo crédito ativo deve ser verdadeiro ou falso.' })
   @IsOptional()
   creditoIsAtive?: boolean;
-
-  @IsBoolean()
+  @IsBoolean({ message: 'O campo fornecedor deve ser verdadeiro ou falso.' })
   @IsOptional()
   isFornecedor?: boolean;
-
-  @IsBoolean()
+  @IsBoolean({ message: 'O campo cliente deve ser verdadeiro ou falso.' })
   @IsOptional()
   isCliente?: boolean;
-
-  @IsString()
+  @IsString({ message: 'O CNPJ deve ser um texto válido.' })
   @IsOptional()
   cnpj?: string;
-
-  @IsString()
+  @IsString({ message: 'O CPF deve ser um texto válido.' })
   @IsOptional()
   cpf?: string;
-
-  @IsBoolean()
+  @IsBoolean({ message: 'O campo ativo deve ser verdadeiro ou falso.' })
   @IsOptional()
   isAtive?: boolean;
+  @IsDate({ message: 'A última compra deve ser uma data válida.' })
+  @IsOptional()
+  ultimaCompra?: Date;
+  @IsDate({ message: 'A última venda deve ser uma data válida.' })
+  @IsOptional()
+  ultimaVenda?: Date;
 }
