@@ -7,51 +7,70 @@ import {
   Param,
   Patch,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { EntidadeService } from './entidade.service';
-import { AuthGuard } from '@nestjs/passport';
 import { CreateEntidadeDto } from './dto/create-entidade.dto';
 import { ChangeEntidadeDto } from './dto/change-entidade.dto';
+import { UserGuard } from 'src/auth/user.guard';
+import { UserReqType } from 'src/types/UserReqType';
 
 @Controller('entidade')
 export class EntidadeController {
   constructor(private readonly entidadeService: EntidadeService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserGuard)
   @Get()
   @HttpCode(200)
-  async findAll(): Promise<any> {
+  async findAll(@Request() req: UserReqType): Promise<any> {
+    console.log(`${req.user.email} - Buscando todas as Entidades`);
     return await this.entidadeService.findAll();
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserGuard)
   @Get(':id')
   @HttpCode(200)
-  async findById(@Param('id') id: string): Promise<any> {
+  async findById(
+    @Param('id') id: string,
+    @Request() req: UserReqType,
+  ): Promise<any> {
+    console.log(`${req.user.email} - Buscando Entidade por ID: {Id: ${id}}`);
     return await this.entidadeService.findById(Number(id));
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserGuard)
   @Post()
   @HttpCode(200)
-  async createEntidade(@Body() data: CreateEntidadeDto): Promise<any> {
+  async createEntidade(
+    @Body() data: CreateEntidadeDto,
+    @Request() req: UserReqType,
+  ): Promise<any> {
+    console.log(`${req.user.email} - Criando Entidade: {nome: ${data.name}}`);
     return await this.entidadeService.createEntidade(data);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserGuard)
   @Patch()
   @HttpCode(200)
   async changeEntidade(
     @Body() data: ChangeEntidadeDto,
+    @Request() req: UserReqType,
   ): Promise<string | void> {
+    console.log(
+      `${req.user.email} - Editando Entidade: {Id: ${data.id}, nome: ${data.name}}`,
+    );
     return await this.entidadeService.changeEntidade(data);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(UserGuard)
   @Delete(':id')
   @HttpCode(200)
-  async deleteEntidade(@Param('id') id: string): Promise<string | void> {
+  async deleteEntidade(
+    @Param('id') id: string,
+    @Request() req: UserReqType,
+  ): Promise<string | void> {
+    console.log(`${req.user.email} - Deletando Entidade: {Id: ${id}}`);
     return await this.entidadeService.deleteEntidade(Number(id));
   }
 }

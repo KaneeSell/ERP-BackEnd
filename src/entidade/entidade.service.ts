@@ -23,7 +23,24 @@ export class EntidadeService {
   }
 
   async createEntidade(data: CreateEntidadeDto): Promise<Entidade> {
-    return await this.prisma.entidade.create({ data });
+    const entidade = {
+      name: data.name,
+      email: data.email ?? undefined,
+      telefone: data.telefone ?? undefined,
+      endereco: data.endereco ?? undefined,
+      cidade: data.cidade ?? undefined,
+      estado: data.estado ?? undefined,
+      cep: data.cep ?? undefined,
+      creditoGasto: data.creditoGasto ?? undefined,
+      creditoLimite: data.creditoLimite ?? undefined,
+      creditoIsAtive: data.creditoIsAtive ?? undefined,
+      isFornecedor: data.isFornecedor ?? undefined,
+      isCliente: data.isCliente ?? undefined,
+      cnpj: data.cnpj ?? undefined,
+      cpf: data.cpf ?? undefined,
+      isAtive: data.isAtive ?? undefined,
+    };
+    return await this.prisma.entidade.create({ data: entidade });
   }
 
   async changeEntidade(data: ChangeEntidadeDto): Promise<string | void> {
