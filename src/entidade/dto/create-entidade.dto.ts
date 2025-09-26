@@ -12,8 +12,8 @@ export class CreateEntidadeDto {
   @IsNotEmpty({ message: 'O Nome é Obrigatório.' })
   @IsString({ message: 'O nome é obrigatório e deve ser um texto válido.' })
   name: string;
-  @IsEmail({}, { message: 'E-mail inválido. Informe um e-mail válido.' })
   @IsOptional()
+  @IsEmail({}, { message: 'E-mail inválido. Informe um e-mail válido.' })
   email?: string;
   @IsString({ message: 'Telefone deve ser um texto válido.' })
   @IsOptional()

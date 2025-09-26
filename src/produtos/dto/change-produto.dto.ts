@@ -13,9 +13,9 @@ export class ChangeProdutoDto {
   valueVenda: number;
   @IsNotEmpty({ message: 'O status é Obrigatório.' })
   isAtive: boolean;
-  @IsNotEmpty({ message: 'O tipo de unidade é Obrigatório.' })
+  @IsOptional()
   tipoUnidade: TipoUnidade;
-  @IsNotEmpty({ message: 'A quantidade é Obrigatória.' })
+  @IsOptional()
   quantidade: number;
   @IsOptional()
   @IsNotEmpty({ message: 'A descrição é Obrigatória.' })

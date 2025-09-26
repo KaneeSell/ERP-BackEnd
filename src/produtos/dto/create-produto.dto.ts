@@ -10,13 +10,10 @@ export class CreateProdutoDto {
   @IsNotEmpty({ message: 'O valor de venda é Obrigatório.' })
   valueVenda: number;
   @IsOptional()
-  @IsNotEmpty({ message: 'O tipo de unidade é Obrigatório.' })
   tipoUnidade: TipoUnidade;
   @IsOptional()
-  @IsNotEmpty({ message: 'A quantidade é Obrigatória.' })
   quantidade: number;
   @IsOptional()
-  @IsNotEmpty({ message: 'A descrição é Obrigatória.' })
   descricao: string;
   @IsOptional()
   @IsDate({ message: 'A data da última venda é inválida.' })
