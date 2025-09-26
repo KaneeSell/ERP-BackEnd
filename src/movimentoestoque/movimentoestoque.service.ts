@@ -18,6 +18,15 @@ export class MovimentoEstoqueService {
     console.log(
       `criando movimento estoque: { produto_id: ${data.produto_id}, estoque_id: ${data.estoque_id}, quantidade: ${data.quantidade}, tipo: ${data.tipo} }`,
     );
+    await this.prisma.produtos.update({
+      where: { id: data.produto_id },
+      data: {
+        quantidade:
+          data.tipo === 'Entrada'
+            ? { increment: data.quantidade }
+            : { decrement: data.quantidade },
+      },
+    });
     try {
       return await this.prisma.movimento_Estoque.create({
         data: {

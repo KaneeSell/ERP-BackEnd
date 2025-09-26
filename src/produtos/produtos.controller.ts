@@ -16,6 +16,7 @@ import { CreateProdutoDto } from './dto/create-produto.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ChangeProdutoDto } from './dto/change-produto.dto';
 import { UserReqType } from 'src/types/UserReqType';
+import { AdminGuard } from 'src/auth/admin.guard';
 
 @Controller('produtos')
 export class ProdutosController {
@@ -52,6 +53,16 @@ export class ProdutosController {
     const user = req.user;
     console.log(`[${user.email}] - Criando produto [ ${data.name} ].`);
     return this.produtoService.createProduto(data);
+  }
+  @UseGuards(AdminGuard)
+  @Post('reset-quantidade')
+  @HttpCode(200)
+  async resetProdutosQuantidade(
+    @Request() req: UserReqType,
+  ): Promise<{ message: string; data: number }> {
+    const user = req.user;
+    console.log(`[${user.email}] - Resetando quantidade dos produtos...`);
+    return this.produtoService.resetProdutosQuantidade();
   }
 
   @UseGuards(AuthGuard('jwt'))

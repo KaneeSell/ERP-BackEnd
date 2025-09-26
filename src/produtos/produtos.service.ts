@@ -24,6 +24,28 @@ export class ProdutosService {
       },
     });
   }
+  async resetProdutosQuantidade(): Promise<{ message: string; data: number }> {
+    console.log(
+      `resetando quantidade dos produtos: { data: ${new Date().toLocaleDateString()}, hora: ${new Date().toLocaleTimeString()} }`,
+    );
+    return {
+      message: 'Atualizado Quantidade em produtos com Sucesso!',
+      data: await this.prisma.$executeRawUnsafe(`
+    UPDATE "Produtos" p
+    SET quantidade = COALESCE((
+        SELECT SUM(
+            CASE 
+                WHEN m.tipo = 'Entrada' THEN m.quantidade
+                WHEN m.tipo = 'Saida' THEN -m.quantidade
+                ELSE 0
+            END
+        )
+        FROM "Movimento_Estoque" m
+        WHERE m."produtoId" = p.id
+    ), 0);
+  `),
+    };
+  }
 
   async findById(id: number): Promise<Produtos | null> {
     console.log(`buscando produtos por id: { id: ${id} }`);
