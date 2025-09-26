@@ -40,7 +40,7 @@ export class MovimentoEstoqueController {
   @HttpCode(200)
   async createMovimentoEstoque(
     @Body() data: CreateMovimentoEstoqueDto,
-  ): Promise<Movimento_Estoque> {
+  ): Promise<Movimento_Estoque | string> {
     return this.movimentoEstoqueService.createMovimentoEstoque(data);
   }
 
