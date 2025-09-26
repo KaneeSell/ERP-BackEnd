@@ -130,6 +130,18 @@ model Produtos {
   grupoProduto        GrupoProduto?         @relation(fields: [grupoProdutoId], references: [id])
   SubGrupoProduto     SubGrupoProduto?      @relation(fields: [subGrupoProdutoId], references: [id])
   subGrupoProdutoId   Int?
+  tags                TagProduto[]          @relation("ProdutosTags")
+}
+
+model TagProduto {
+  id         Int        @id @default(autoincrement())
+  name       String     @unique
+  descricao  String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+  produtosId Int?
+  produtos   Produtos[] @relation("ProdutosTags")
 }
 
 model GrupoProduto {
